@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { IProductos } from '../interface/productos.interface';
-import { Clientes } from 'src/module/clientes/schema/clientes.schema';
+import { Cliente } from 'src/module/clientes/schema/clientes.schema';
 
 @Schema()
 export class Productos extends Document implements IProductos {
   @Prop({ required: true })
-  nombre_producto: string;
+  nombre_producto: string; 
 
   @Prop({ required: true })
   cantidad: number;
