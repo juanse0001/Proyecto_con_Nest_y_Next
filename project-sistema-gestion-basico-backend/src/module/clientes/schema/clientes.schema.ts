@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ICliente } from '../interface/clientes.interface';
 import { Document } from 'mongoose';
 
 @Schema()
-export class Cliente extends Document {
+export class Cliente extends Document implements ICliente {
   @Prop({ required: true })
   nombre: string; // Nombre completo del cliente
 

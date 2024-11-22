@@ -4,17 +4,17 @@ import { ProductosServices } from './services/productos.services';
 import { ProductosController } from './controller/productos.controller';
 import { Productos, ProductoSchema } from './schema/productos.schema';
 import { ProveedoresModule } from '../proveedores/proveedores.module';
-import { ProveedoresServices } from '../proveedores/service/proveedores.service';
+import { RelacionesProductoService } from './services/relaciones-producto.service';
 import { ClientesModule } from '../clientes/clientes.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Productos.name, schema: ProductoSchema }]),
-    ProveedoresModule,
-    ClientesModule,
+    ProveedoresModule, // Asegúrate de importar el módulo de proveedores
+    ClientesModule, // Importa el módulo de clientes
   ],
   controllers: [ProductosController],
-  providers: [ProductosServices],
-  exports: [ProductosServices]
+  providers: [ProductosServices, RelacionesProductoService],
+  exports: [ProductosServices, RelacionesProductoService],
 })
 export class ProductosModule {}

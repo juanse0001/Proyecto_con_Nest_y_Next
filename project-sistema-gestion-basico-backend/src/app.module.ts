@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProveedoresModule } from './module/proveedores/proveedores.module';
-//import { ClientesModule } from './module/clientes/clientes.module';
+import { ClientesModule } from './module/clientes/clientes.module';
 import { ProductosModule } from './module/productos/productos.module';
 
 @Module({
@@ -10,7 +10,7 @@ import { ProductosModule } from './module/productos/productos.module';
       'mongodb://localhost:27017',
     ),
     ProveedoresModule,
-//    ClientesModule,
+    ClientesModule,
     ProductosModule,
   ],
 })
