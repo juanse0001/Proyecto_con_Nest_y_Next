@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductosServices } from './services/productos.services';
-import { ProductosControllers } from './controllers/productos.controllers';
+import { ProductosController } from './controller/productos.controller';
 import { Productos, ProductoSchema } from './schema/productos.schema';
 import { ProveedoresModule } from '../proveedores/proveedores.module';
 import { ProveedoresServices } from '../proveedores/service/proveedores.service';
@@ -13,8 +13,8 @@ import { ClientesModule } from '../clientes/clientes.module';
     ProveedoresModule,
     ClientesModule,
   ],
-  controllers: [ProductosControllers],
+  controllers: [ProductosController],
   providers: [ProductosServices],
-  // exports: [ProductosServices]
+  exports: [ProductosServices]
 })
 export class ProductosModule {}
