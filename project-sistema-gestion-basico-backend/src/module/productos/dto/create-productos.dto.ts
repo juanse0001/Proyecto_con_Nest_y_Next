@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsArray, ArrayNotEmpty } from 'class-validator';
-import { Clientes } from 'src/module/clientes/schema/clientes.schema';
+import { Cliente } from 'src/module/clientes/schema/clientes.schema';
 
 export class CreateProductoDto {
   @IsString()
@@ -20,7 +20,7 @@ export class CreateProductoDto {
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
-  cliente?: Clientes[];
+  cliente?: Cliente[];
 
   @IsOptional()
   activo?: boolean;
