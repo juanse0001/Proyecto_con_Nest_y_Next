@@ -40,6 +40,22 @@ export class ProductosServices {
     return producto;
   }
 
+  async updatePartial(id: string, updateProductosDto: UpdateProductosDto): Promise<Productos> {
+    // Actualiza parcialmente el producto en la base de datos
+    const updatePartialProducto = await this.productosModel.findByIdAndUpdate(
+      id,
+      { $set: updateProductosDto }, // Utiliza `$set` para actualizar solo los campos especificados
+      { new: true } // Devuelve el documento actualizado
+    ).exec();
+  
+    // Si el producto no existe, lanza una excepción
+    if (!updatePartialProducto) {
+      throw new NotFoundException(`Producto con ID ${id} no se encontró`);
+    }
+  
+    return updatePartialProducto;
+  }
+  
   async deactivate(id: string): Promise<void> {
     const producto = await this.productosModel.findByIdAndUpdate(
       id,
