@@ -1,7 +1,7 @@
 'use client';
 import React from "react";
 import type { AppProps } from "next/app"; // Importamos el tipo adecuado de Next.js
-import ProveedorLista from "./proveedores/lista/ListaProveedores";
+import ProveedorLista from "./proveedores/ista/listaProveedores";
 import styles from "../page.module.css";
 
 export default function page() {
