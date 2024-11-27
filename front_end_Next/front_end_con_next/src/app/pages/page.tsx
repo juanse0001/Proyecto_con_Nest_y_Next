@@ -1,7 +1,7 @@
 'use client';
 import React from "react";
 import type { AppProps } from "next/app"; // Importamos el tipo adecuado de Next.js
-import ProveedorLista from "./proveedores/ista/listaProveedores";
+import ProveedorLista from "./proveedores/lista/listaProveedores";
 import styles from "../page.module.css";
 
 export default function page() {
@@ -17,6 +17,8 @@ export default function page() {
             <footer className={styles.footer}>
                 <p>© 2024 My Application</p>
             </footer>
+
+            <ProveedorLista/>
         </div>
     );
 }
