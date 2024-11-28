@@ -189,14 +189,16 @@ const ProveedorLista = () => {
     }
   };
 
+
   const handleDeactivate = async (id: string) => {
     try {
-      await fetch(`http://localhost:2000/api/proveedores/deactive/${id}`, { method: 'PUT' });
+      await fetch(`http://localhost:2000/api/proveedores/deactivate/${id}`, { method: 'PUT' });
       fetchProveedores();
     } catch (error) {
       console.error("Error al desactivar el proveedor:", error);
     }
   };
+  
 
   const handleDelete = async (id: string) => {
     try {
