@@ -1,16 +1,10 @@
-import Navbar from "../../components/navbar/Navbar";
-import styles from "./page.module.css";
+'use client';
+import ProveedorLista from "./lista/listaProveedores";
 
-export default function Home() {
-    return (
-        <div className={styles.page}>
-            <Navbar />
-            <main className={styles.main}>
-                <h1>Welcome to the Home Page</h1>
-            </main>
-            <footer className={styles.footer}>
-                <p>© 2024 My Application</p>
-            </footer>
-        </div>
-    );
+export default function ProveedoresPage() {
+  return (
+    <div>
+      <ProveedorLista />
+    </div>
+  )
 }

@@ -1,543 +1,333 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Container,
+  Grid,
+  Card,
+  CardContent,
   Typography,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   Snackbar,
   Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Modal,
-  TextField,
-  Box,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
+} from "@mui/material";
+import { styled } from "@mui/system";
 
-} from '@mui/material';
-import { styled } from '@mui/system';
-import { Productos } from '@/app/types/Producto.type';
-import { Clientes } from '@/app/types/Clientes.type';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import BusinessIcon from '@mui/icons-material/Business';
-import ToggleOffIcon from '@mui/icons-material/ToggleOff';
-import ToggleOnIcon from '@mui/icons-material/ToggleOn';
-import Tooltip from '@mui/material/Tooltip';
-import Checkbox from '@mui/material/Checkbox';
-import { SelectChangeEvent } from '@mui/material/Select';
-import Swal from 'sweetalert2';
-import 'sweetalert2/src/sweetalert2.scss';
-import { Proveedores } from '@/app/types/Proveedor.type';
-
-
-
-// Estilos para botones y tabla
-const ActionButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(0.5),
-  padding: theme.spacing(1),
-  fontSize: '0.875rem',
-  fontWeight: 'bold',
-  textTransform: 'none',
-  borderRadius: '10px',
+// Estilo para las tarjetas dinámicas
+const StyledCard = styled(Card)(({ theme }) => ({
+  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-8px)", // Movimiento suave al hover
+  },
+  width: "100%", // Ancho completo en pantallas pequeñas
+  marginBottom: theme.spacing(2),
+  borderRadius: "20px", // Bordes más redondeados
+  backgroundColor: "#f9f9f9", // Fondo suave para las tarjetas
+  padding: theme.spacing(3), // Espaciado interno
+  [theme.breakpoints.up("md")]: {
+    width: "75%", // Ancho más grande en pantallas medianas y grandes
+    margin: "auto", // Centrado horizontal en pantallas más grandes
+  },
 }));
 
+// Estilo para los botones de acción personalizados
+const ActionButton = styled(Button)(({ theme }) => ({
+  margin: theme.spacing(1),
+  padding: theme.spacing(1.5),
+  fontSize: "0.875rem",
+  fontWeight: "bold",
+  textTransform: "none",
+  borderRadius: "10px",
+  transition: "background-color 0.3s ease",
+}));
 
+const ActivateButton = styled(ActionButton)({
+  backgroundColor: "#4caf50",
+  color: "#fff",
+  "&:hover": {
+    backgroundColor: "#388e3c",
+  },
+});
 
-// Estilo del modal
-const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+const DeactivateButton = styled(ActionButton)({
+  backgroundColor: "#ff9800",
+  color: "#fff",
+  "&:hover": {
+    backgroundColor: "#f57c00",
+  },
+});
 
+const DeleteButton = styled(ActionButton)({
+  backgroundColor: "#f44336",
+  color: "#fff",
+  "&:hover": {
+    backgroundColor: "#d32f2f",
+  },
+});
 
+const UpdateButton = styled(ActionButton)({
+  backgroundColor: "#2196f3",
+  color: "#fff",
+  "&:hover": {
+    backgroundColor: "#1976d2",
+  },
+});
 
-const ProductoLista: React.FC = () => {
-  const [productos, setProductos] = useState<Productos[]>([]);
-  const [nuevoProducto, setNuevoProducto] = useState<Omit<Productos, '_id'>>({
-    nombre_producto: '',
-    cantidad: 0,
-    precio: 0,
-    proveedor: [],
-    cliente: [],
-    activo: true,
+const ProveedorLista = () => {
+  const [proveedores, setProveedores] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [formValues, setFormValues] = useState({
+    nombre_proveedor: '',
+    email_proveedor: '',
+    celular_proveedor: '',
+    activo_proveedor: true,
   });
+  const [selectedProveedor, setSelectedProveedor] = useState<any>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [openModal, setOpenModal] = useState(false);
-  const [productoEditado, setProductoEditado] = useState<Productos | null>(null);
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [clientes, setClientes] = useState<Clientes[]>([]);
-  const [clientesSeleccionados, setClientesSeleccionados] = useState<string[]>([]);
-  const [proveedores, setProveedores] = useState<Proveedores[]>([]);
-  const [proveedoresSeleccionados, setProveedoresSeleccionados] = useState<string[]>([]);
-  const [producto, setProducto] = useState<Productos | null>(null);
-  
+  const [actionType, setActionType] = useState<'create' | 'update'>('create');
 
-  const obtenerClientes = async () => {
-    const response = await fetch('http://localhost:2000/api/clientes');
-    const data = await response.json();
-    setClientes(data);
-  };
+  useEffect(() => {
+    fetchProveedores();
+  }, [])
 
-  const obtenerProveedores = async () => {
-    const response = await fetch('http://localhost:2000/api/proveedores');
-    const data = await response.json();
-    setProveedores(data);
-  };
-
-
-  const obtenerProductos = async () => {
-    const response = await fetch('http://localhost:2000/api/productos');
-    const data = await response.json();
-    setProductos(data);
-  };
-
-  const crearProducto = async (data: Omit<Productos, '_id'>) => {
-    const response = await fetch('http://localhost:2000/api/productos', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      setNuevoProducto({ nombre_producto: '', cantidad: 0, precio: 0, proveedor: [], cliente: [], activo: true });
-      setOpenModal(false);
-      await obtenerProductos();
-    } else {
-      const errorData = await response.json();
-      setErrorMessage(errorData.message || 'Error al crear producto');
+  const fetchProveedores = async () => {
+    try {
+      const respuesta = await fetch('http://localhost:2000/api/proveedores');
+      if (!respuesta.ok) throw new Error('Error al obtener todos los proveedores');
+      const data = await respuesta.json();
+      setProveedores(data);
+    } catch (error) {
+      console.error('Error al obtener los proveedores:', error);
+      setErrorMessage('Error al obtener los proveedores');
       setOpenSnackbar(true);
     }
   };
 
-  const eliminarProducto = async (id: string) => {
-    // Mostrar SweetAlert para confirmar eliminación
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'No podrás revertir esto!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar!',
-      cancelButtonText: 'Cancelar',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        // Si el usuario confirma, procedemos con la eliminación
-        const response = await fetch(`http://localhost:2000/api/productos/delete/${id}`, {
-          method: 'DELETE',
-        });
+  const handleOpenModal = (proveedor: any = null) => {
+    setSelectedProveedor(proveedor);
 
-        if (response.ok) {
-          await obtenerProductos();
-          Swal.fire('Eliminado!', 'El producto ha sido eliminado.', 'success');
-        } else {
-          setErrorMessage('Error al eliminar producto');
-          setOpenSnackbar(true);
-        }
-      }
-    });
-  };
-
-  const handleClienteChange = (event: SelectChangeEvent<string[]>) => {
-    const {
-      target: { value },
-    } = event;
-    setClientesSeleccionados(value as string[]); // Asegúrate de que sea un array de strings
-  };
-
-  const handleProveedorChange = (event: SelectChangeEvent<string[]>) => {
-    const {
-      target: { value },
-    } = event;
-    setProveedoresSeleccionados(value as string[]); // Asegúrate de que sea un array de strings
-  };
-
-  useEffect(() => {
-    obtenerProductos();
-  }, []);
-
-  useEffect(() => {
-    if (openModal) {
-      obtenerClientes();
-      obtenerProveedores();
+    if (proveedor) {
+      setFormValues({
+        nombre_proveedor: proveedor.nombre_proveedor,
+        email_proveedor: proveedor.email_proveedor,
+        celular_proveedor: proveedor.celular_proveedor,
+        activo_proveedor: proveedor.activo_proveedor,
+      });
+      setActionType('update');
+    } else {
+      setFormValues({
+        nombre_proveedor: '',
+        email_proveedor: '',
+        celular_proveedor: '',
+        activo_proveedor: true,
+      });
+      setActionType('create');
     }
-  }, [openModal]);
 
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-    setErrorMessage('');
-  };
-
-  const handleOpenModal = () => {
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setNuevoProducto({ nombre_producto: '', cantidad: 0, precio: 0, proveedor: [], cliente: [], activo: true });
-    setProveedoresSeleccionados ([]);
-    setClientesSeleccionados([]);
+    setSelectedProveedor(null);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    setNuevoProducto(prev => ({
-      ...prev,
-      [name]: name === 'nombre_producto' ? value.toUpperCase() : name === 'cantidad' || name === 'precio' ? Number(value) : value,
-    }));
-  };
-
-  const handleOpenEditModal = (producto: Productos) => {
-    setProductoEditado(producto);
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-    setProductoEditado(null);
-  };
-
-  const actualizarProducto = async (id: string, data: Omit<Productos, '_id'>) => {
-    const response = await fetch(`http://localhost:2000/api/productos/update/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+    setFormValues({
+      ...formValues,
+      [name]: value,
     });
+  };
 
-    if (response.ok) {
-      await obtenerProductos();
-      handleCloseEditModal();
-    } else {
-      const errorData = await response.json();
-      setErrorMessage(errorData.message || 'Error al actualizar producto');
+  const handleSaveProveedor = async () => {
+    try {
+      let url;
+      let method;
+      if (actionType === 'create') {
+        url = 'http://localhost:2000/api/proveedores';
+        method = 'POST';
+      } else if (actionType === 'update') {
+        url = `http://localhost:2000/api/proveedores/update/${selectedProveedor._id}`;
+        method = 'PUT';
+      }
+
+      const response = await fetch(`${url}`, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al guardar el proveedor');
+      }
+
+      fetchProveedores();
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error al guardar el proveedor:", error);
+      setErrorMessage("Error al guardar el proveedor");
       setOpenSnackbar(true);
     }
   };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (productoEditado) {
-      setProductoEditado((prev) => ({
-        ...prev!,
-        [name]: name === 'nombre_producto' ? value.toUpperCase() : name === 'cantidad' || name === 'precio' ? Number(value) : value,
-      }));
+  const handleActivate = async (id: string) => {
+    try {
+      await fetch(`http://localhost:2000/api/proveedores/active/${id}`, { method: 'PUT' });
+      fetchProveedores();
+    } catch (error) {
+      console.error("Error al activar el proveedor:", error);
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const clientesSeleccionadosDetalles = clientesSeleccionados.map(id => obtenerClientePorId(id));
-    const proveedoresSeleccionadosDetalles = proveedoresSeleccionados.map(id => obtenerProveedorPorId(id));
-
-    const productoData = {
-      ...nuevoProducto,
-      cliente: clientesSeleccionadosDetalles,
-      proveedor : proveedoresSeleccionadosDetalles,
-    };
-
-    crearProducto(productoData);
-  };
-
-  const obtenerClientePorId = (id: string): Clientes => {
-    return clientes.find(cliente => cliente.id_cliente === id) as Clientes;
-  };
-
-  const obtenerProveedorPorId = (id: string): Proveedores => {
-    return proveedores.find(proveedor => proveedor.id_proveedor === id) as Proveedores;
-  };
-
-  const toggleActivo = async (id: string, activo: boolean) => {
-    const response = await fetch(`http://localhost:2000/api/productos/${activo ? 'deactive' : 'active'}/${id}`, {
-      method: 'PUT',
-    });
-
-    if (response.ok) {
-      await obtenerProductos();
-    } else {
-      setErrorMessage('Error al cambiar estado del producto');
-      setOpenSnackbar(true);
+  const handleDeactivate = async (id: string) => {
+    try {
+      await fetch(`http://localhost:2000/api/proveedores/deactive/${id}`, { method: 'PUT' });
+      fetchProveedores();
+    } catch (error) {
+      console.error("Error al desactivar el proveedor:", error);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`http://localhost:2000/api/proveedores/delete/${id}`, { method: 'DELETE' });
+      fetchProveedores();
+    } catch (error) {
+      console.error("Error al eliminar el proveedor:", error);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+    setErrorMessage("");
   };
 
   return (
-    <Container
-      maxWidth="lg"
-      style={{
-        marginTop: '20px',
-        height: '90vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-        background: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
-        paddingBottom: '20px',
-      }}
-    >
-      <section style={{ width: '100%', position: 'relative' }}>
-        <Typography variant="h4" style={{ marginBottom: '30px', textAlign: 'center', color: '#fff' }}>
-          Lista de Productos
-        </Typography>
+    <Container maxWidth="lg" style={{ marginTop: "100px" }}>
+      <section style={{
+        // Gradiente de colores
+        background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+        // Espaciado interno
+        padding: "20px",
+        // Bordes redondeados
+        borderRadius: "10px",
+        // Color del texto
+        color: "#fff"
+      }}>
 
-        {/* Botón para abrir el modal de agregar producto */}
         <Button
           variant="contained"
-          onClick={handleOpenModal}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            backgroundColor: '#6a11cb',
-            color: '#fff',
-          }}
+          color="primary"
+          onClick={() => handleOpenModal()}
+          style={{ marginBottom: "30px" }} // Espaciado adicional
         >
-          <AddIcon /> Agregar Producto
+          Crear Proveedor
         </Button>
 
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ color: '#6a11cb' }}>Nombre del Producto</TableCell>
-                <TableCell style={{ color: '#6a11cb' }}>Cantidad</TableCell>
-                <TableCell style={{ color: '#6a11cb' }}>Precio</TableCell>
-                <TableCell style={{ color: '#6a11cb' }}>Estado</TableCell>
-                <TableCell style={{ color: '#6a11cb' }}>Clientes Asociados</TableCell>
-                <TableCell style={{ color: '#6a11cb' }}>Proveedores Asociados </TableCell>
-                <TableCell style={{ color: '#6a11cb' }}>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {productos.map((producto) => (
-                <TableRow key={producto._id}>
-                  <TableCell>{producto.nombre_producto}</TableCell>
-                  <TableCell>{producto.cantidad}</TableCell>
-                  <TableCell>${producto.precio}</TableCell>
-                  <TableCell>
-                    <span style={{ color: producto.activo ? 'green' : 'red', fontWeight: 'bold' }}>
-                      {producto.activo ? 'Activo' : 'Desactivado'}
-                    </span>
-                  </TableCell>
-
-                  <TableCell>
-                    {Array.isArray(producto.cliente) && producto.cliente.length > 0 ? (
-                      producto.cliente.map((cli) => <div key={cli.id_cliente}>{cli.nombre_cliente}</div>)
-                    ) : (
-                      'Sin clientes'
-                    )}
-                  </TableCell>
-
-                  <TableCell>
-                    {Array.isArray(producto.proveedor) && producto.proveedor.length > 0 ? (
-                      producto.proveedor.map((prov) => <div key={prov.id_proveedor}>{prov.nombre_proveedor}</div>)
-                    ) : (
-                      'Sin proveedores'
-                    )}
-                  </TableCell>
-
-                  <TableCell>
-                    <Tooltip title="Editar producto">
-                      <Button onClick={() => handleOpenEditModal(producto)}>
-                        <EditIcon />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title={producto.activo ?? false ? 'Desactivar' : 'Activar'}>
-                      <Button
-                        onClick={() => toggleActivo(producto._id, producto.activo?? false)}
-                        style={{
-                          backgroundColor: producto.activo ? 'green' : 'red',
-                          color: '#fff',
-                        }}
-                      >
-                        {producto.activo ? <ToggleOnIcon /> : <ToggleOffIcon />}
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Eliminar producto">
-                      <Button onClick={() => eliminarProducto(producto._id)}>
-                        <DeleteIcon />
-                      </Button>
-                    </Tooltip>
-
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Modal para agregar producto */}
-        <Modal open={openModal} onClose={handleCloseModal}>
-          <Box sx={{ ...style, backgroundColor: 'white', color: 'black', padding: '20px', borderRadius: '8px' }}>
-            <Typography variant="h6" component="h2" sx={{ marginBottom: '20px', fontWeight: 'bold' }}>
-              Agregar Producto
-            </Typography>
-
-            {/* Botón de salir */}
-            <Button onClick={handleCloseModal} sx={{ position: 'absolute', top: '10px', right: '10px' }}>
-              Salir
-            </Button>
-
-            <form onSubmit={handleSubmit}>
-              {/* Campos de entrada */}
-              <TextField
-                name="nombre_producto"
-                label="Nombre del Producto"
-                value={nuevoProducto.nombre_producto}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                InputLabelProps={{ style: { color: 'black' } }}
-              />
-              <TextField
-                name="cantidad"
-                label="Cantidad"
-                type="number"
-                value={nuevoProducto.cantidad}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                InputLabelProps={{ style: { color: 'black' } }}
-              />
-              <TextField
-                name="precio"
-                label="Precio"
-                type="number"
-                value={nuevoProducto.precio}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                InputLabelProps={{ style: { color: 'black' } }}
-              />
-
-              {/* Selección de clientes */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel style={{ color: 'black' }}>Clientes</InputLabel>
-                <Select
-                  multiple
-                  value={clientesSeleccionados}
-                  onChange={handleClienteChange}
-                  renderValue={(selected) =>
-                    selected.map((id) => obtenerClientePorId(id)?.nombre_cliente).join(', ')
-                  }
-                  sx={{ color: 'black' }}
-                >
-                  {clientes.map((cliente) => (
-                    <MenuItem key={cliente.id_cliente} value={cliente.id_cliente}>
-                      {cliente.nombre_cliente}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Selección de proveedores */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel style={{ color: 'black' }}>Proveedores</InputLabel>
-                <Select
-                  multiple
-                  value={proveedoresSeleccionados}
-                  onChange={handleProveedorChange}
-                  renderValue={(selected) =>
-                    selected.map((id) => obtenerProveedorPorId(id)?.nombre_proveedor).join(', ')
-                  }
-                  sx={{ color: 'black' }}
-                >
-                  {proveedores.map((proveedor) => (
-                    <MenuItem key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
-                      {proveedor.nombre_proveedor}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Botón para guardar */}
-              <Button variant="contained" type="submit" fullWidth sx={{ marginTop: '20px' }}>
-                Guardar Producto
-              </Button>
-            </form>
-          </Box>
-        </Modal>
-
-        {/* Modal para editar producto */}
-        <Modal open={openEditModal} onClose={handleCloseEditModal}>
-          <Box sx={style}>
-            <Typography variant="h6" component="h2" style={{ marginBottom: '16px', color: 'purple' }}>
-              Editar Producto
-            </Typography>
-            {productoEditado && (
-              <form onSubmit={(e) => { e.preventDefault(); actualizarProducto(productoEditado._id, productoEditado); }}>
-                <TextField
-                  label="Nombre del Producto"
-                  name="nombre_producto"
-                  value={productoEditado.nombre_producto}
-                  onChange={handleEditChange}
-                  required
-                  fullWidth
-                  style={{ marginBottom: '16px' }}
-                />
-                <TextField
-                  label="Cantidad"
-                  name="cantidad"
-                  type="number"
-                  value={productoEditado.cantidad}
-                  onChange={handleEditChange}
-                  required
-                  fullWidth
-                  style={{ marginBottom: '16px' }}
-                />
-                <TextField
-                  label="Precio"
-                  name="precio"
-                  type="number"
-                  value={productoEditado.precio}
-                  onChange={handleEditChange}
-                  required
-                  fullWidth
-                  style={{ marginBottom: '16px' }}
-                />
-                <Button type="submit" variant="contained" color="primary" style={{ marginRight: '8px' }}>
-                  Actualizar
-                </Button>
-                <Button variant="outlined" style={{ backgroundColor: 'red', color: 'white' }} onClick={handleCloseEditModal}>
-                  Salir
-                </Button>
-              </form>
-            )}
-          </Box>
-        </Modal>
-
-        {/* Snackbar para mensajes de error */}
-        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-          <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
-            {errorMessage}
-          </Alert>
-        </Snackbar>
+        <Grid container spacing={3}>
+          {proveedores.map((proveedor: any) => (
+            <Grid item xs={12} md={6} key={proveedor._id}>
+              <StyledCard>
+                <CardContent>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    {proveedor.nombre_proveedor}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Email: {proveedor.email_proveedor}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Celular: {proveedor.celular_proveedor}
+                  </Typography>
+                  <Typography variant="body2" style={{
+                    color: proveedor.activo_proveedor ? '#4caf50' : '#f44336', // Verde si está activo, rojo si está inactivo
+                    fontWeight: 'bold'
+                  }}>
+                    {proveedor.activo_proveedor ? 'Activo' : 'Desactivado'}
+                  </Typography>
+                  <UpdateButton onClick={() => handleOpenModal(proveedor)}>
+                    Actualizar
+                  </UpdateButton>
+                  {proveedor.activo_proveedor ? (
+                    <DeactivateButton onClick={() => handleDeactivate(proveedor._id)}>
+                      Desactivar
+                    </DeactivateButton>
+                  ) : (
+                    <ActivateButton onClick={() => handleActivate(proveedor._id)}>
+                      Activar
+                    </ActivateButton>
+                  )}
+                  <DeleteButton onClick={() => handleDelete(proveedor._id)}>
+                    Eliminar
+                  </DeleteButton>
+                </CardContent>
+              </StyledCard>
+            </Grid>
+          ))}
+        </Grid>
       </section>
+
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        {/* Título del diálogo */}
+        <DialogTitle>{actionType === 'create' ? 'Crear Proveedor' : 'Actualizar Proveedor'}</DialogTitle>
+        {/* Contenido del diálogo */}
+        <DialogContent>
+          {/* Campo para el nombre del proveedor */}
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Nombre"
+            name="nombre_proveedor"
+            value={formValues.nombre_proveedor}
+            onChange={handleInputChange}
+          />
+          {/* Campo para el email del proveedor */}
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Email"
+            name="email_proveedor"
+            value={formValues.email_proveedor}
+            onChange={handleInputChange}
+          />
+          {/* Campo para el celular del proveedor */}
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Celular"
+            name="celular_proveedor"
+            value={formValues.celular_proveedor}
+            onChange={handleInputChange}
+          />
+        </DialogContent>
+        {/* Acciones del diálogo */}
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveProveedor} color="primary">
+            {actionType === 'create' ? 'Crear' : 'Actualizar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Snackbar para mensajes */}
+      <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert severity={errorMessage ? "error" : "success"} onClose={handleCloseSnackbar}>
+          {errorMessage || "Operación exitosa"}
+        </Alert>
+      </Snackbar>
+
     </Container>
   );
 };
 
-export default ProductoLista;
+export default ProveedorLista;

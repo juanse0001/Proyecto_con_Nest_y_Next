@@ -55,6 +55,15 @@ import {
       return this.proveedoresServices.createProveedor(createProveedorDto);
     }
   
+      // Controlador para obtener todos los proveedores
+    @Get()
+    @ApiOperation({ summary: 'Obtener todos los proveedores' })
+    @ApiResponse({ status: 200, description: 'Lista de proveedores obtenida con éxito' })
+    @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+    async findAll(): Promise<Proveedores[]> {
+      return await this.proveedoresServices.findAll();
+    }
+
     // Controlador para desactivar un proveedor
     @Put('deactivate/:id')
     @ApiOperation({ summary: 'Desactivar un proveedor' })
