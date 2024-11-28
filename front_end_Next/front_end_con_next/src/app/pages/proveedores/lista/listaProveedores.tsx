@@ -196,6 +196,7 @@ const ProveedorLista = () => {
       fetchProveedores();
     } catch (error) {
       console.error("Error al desactivar el proveedor:", error);
+      setOpenSnackbar(true);
     }
   };
   
