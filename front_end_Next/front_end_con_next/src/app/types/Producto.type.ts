@@ -1,5 +1,5 @@
-import { Clientes } from "./clientes.type";
-import { Proveedores } from "./proveedor.type";
+import { Clientes } from "./Clientes.type";
+import { Proveedores } from "./Proveedor.type";
 
 export interface Productos {
     _id: string;

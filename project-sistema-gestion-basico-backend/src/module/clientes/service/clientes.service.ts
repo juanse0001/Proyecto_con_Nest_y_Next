@@ -50,4 +50,28 @@ export class ClientesService {
     }
     return { mensaje: `Cliente con ID ${id} eliminado correctamente` };
   }
+
+    // Activar un cliente
+    async activate(id: string): Promise<Cliente> {
+      const clienteActivado = await this.clienteModel
+        .findByIdAndUpdate(id, { estado: 'activo' }, { new: true })
+        .exec();
+      if (!clienteActivado) {
+        throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
+      }
+      return clienteActivado;
+    }
+  
+    // Desactivar un cliente
+    async deactivate(id: string): Promise<Cliente> {
+      const clienteDesactivado = await this.clienteModel
+        .findByIdAndUpdate(id, { estado: 'inactivo' }, { new: true })
+        .exec();
+      if (!clienteDesactivado) {
+        throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
+      }
+      return clienteDesactivado;
+    }
 }
+
+
