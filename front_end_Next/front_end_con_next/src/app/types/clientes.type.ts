@@ -3,5 +3,5 @@ export interface Clientes {
     nombre_cliente: string;
     email_cliente: string;
     celular_cliente: string;
-    estado?: boolean;
+    activo_cliente?: boolean;
 }
