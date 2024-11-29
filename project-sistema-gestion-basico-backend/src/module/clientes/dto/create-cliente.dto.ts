@@ -2,13 +2,13 @@ import { IsString, IsEmail, IsPhoneNumber, IsIn, IsOptional } from 'class-valida
 
 export class CreateClienteDto {
   @IsString()
-  readonly nombre: string;
+  readonly nombre_cliente: string;
 
   @IsEmail()
-  readonly correoElectronico: string;
+  readonly email_cliente: string;
 
   @IsPhoneNumber() // Validación global para cualquier número de teléfono internacional
-  readonly telefono: string;
+  readonly celular_cliente: string;
 
   @IsOptional() // El estado es opcional al crear un cliente
   @IsIn(['activo', 'inactivo']) // Solo permite los valores "activo" o "inactivo"

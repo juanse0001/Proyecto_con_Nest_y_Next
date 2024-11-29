@@ -21,10 +21,6 @@ export default function HomePage()  {
             <footer className={styled.footer}>
                 <p>2024 &copy; Todos los derechos reservados</p>
             </footer>
-
-            <ProveedorLista />
-            <ClienteLista />
-            <ProductoLista />
         </div>
     );
 }
