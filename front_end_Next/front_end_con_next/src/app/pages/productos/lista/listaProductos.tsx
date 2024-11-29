@@ -27,8 +27,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 import { Productos } from '@/app/types/Producto.type';
-import { Proveedores } from '@/app/types/Proveedor.type';
-import { Clientes } from '@/app/types/Clientes.type';
+import { Proveedores } from '@/app/types/proveedor.type';
+import { Clientes } from '@/app/types/clientes.type';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -123,7 +123,7 @@ const ProductoLista: React.FC = () => {
   const [proveedores, setProveedores] = useState<Proveedores[]>([]);
   const [proveedoresSeleccionados, setProveedoresSeleccionados] = useState<string[]>([]);
   const [producto, setProducto] = useState<Productos | null>(null);
-  
+
 
   const obtenerClientes = async () => {
     const response = await fetch('http://localhost:2000/api/clientes');
@@ -153,12 +153,12 @@ const ProductoLista: React.FC = () => {
         },
         body: JSON.stringify(data), // Convertimos los datos a JSON
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al crear el producto');
       }
-  
+
       // Actualizamos la lista de productos tras la creación exitosa
       setNuevoProducto({ nombre_producto: '', cantidad: 0, precio: 0, proveedor: [], cliente: [], activo: true });
       setOpenModal(false); // Cerramos el modal de creación
@@ -170,7 +170,7 @@ const ProductoLista: React.FC = () => {
       setOpenSnackbar(true); // Mostramos el snackbar con el error
     }
   };
-  
+
 
   const eliminarProducto = async (id: string) => {
     // Mostrar SweetAlert para confirmar eliminación
@@ -202,9 +202,11 @@ const ProductoLista: React.FC = () => {
   };
 
   const handleClienteChange = (event: SelectChangeEvent<string[]>) => {
-    const { value } = event.target;
-    setClientesSeleccionados(typeof value === 'string' ? value.split(',') : value);
-  };  
+    const {
+      target: { value },
+    } = event;
+    setClientesSeleccionados(value as string[]);
+  };
 
   const handleProveedorChange = (event: SelectChangeEvent<string[]>) => {
     const {
@@ -237,7 +239,7 @@ const ProductoLista: React.FC = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
     setNuevoProducto({ nombre_producto: '', cantidad: 0, precio: 0, proveedor: [], cliente: [], activo: true });
-    setProveedoresSeleccionados ([]);
+    setProveedoresSeleccionados([]);
     setClientesSeleccionados([]);
   };
 
@@ -269,13 +271,13 @@ const ProductoLista: React.FC = () => {
         },
         body: JSON.stringify(data), // Convertimos los datos a JSON
       });
-  
+
       // Verificamos la respuesta
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al actualizar el producto');
       }
-  
+
       // Actualizamos la lista de productos tras la operación exitosa
       await obtenerProductos();
       handleCloseEditModal(); // Cerramos el modal
@@ -286,8 +288,8 @@ const ProductoLista: React.FC = () => {
       setOpenSnackbar(true); // Mostramos el snackbar con el error
     }
   };
-  
-  
+
+
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -308,7 +310,7 @@ const ProductoLista: React.FC = () => {
     const productoData = {
       ...nuevoProducto,
       cliente: clientesSeleccionadosDetalles,
-      proveedor : proveedoresSeleccionadosDetalles,
+      proveedor: proveedoresSeleccionadosDetalles,
     };
 
     crearProducto(productoData);
@@ -399,7 +401,7 @@ const ProductoLista: React.FC = () => {
 
                   <TableCell>
                     {Array.isArray(producto.cliente) && producto.cliente.length > 0 ? (
-                      producto.cliente.map((cli) => <div key={cli.id_cliente}>{cli.nombre_cliente}</div>)
+                      producto.cliente.map((cli) => <div key={cli.id_cliente}>{cli.nombre}</div>)
                     ) : (
                       'Sin clientes'
                     )}
@@ -421,7 +423,7 @@ const ProductoLista: React.FC = () => {
                     </Tooltip>
                     <Tooltip title={producto.activo ?? false ? 'Desactivar' : 'Activar'}>
                       <Button
-                        onClick={() => toggleActivo(producto._id, producto.activo?? false)}
+                        onClick={() => toggleActivo(producto._id, producto.activo ?? false)}
                         style={{
                           backgroundColor: producto.activo ? 'green' : 'red',
                           color: '#fff',
@@ -491,22 +493,20 @@ const ProductoLista: React.FC = () => {
               <FormControl fullWidth margin="normal">
                 <InputLabel style={{ color: 'black' }}>Clientes</InputLabel>
                 <Select
-                 multiple
-                 value={clientesSeleccionados}
-                 onChange={handleClienteChange}
-                 renderValue={(selected) =>
-                 selected
-                .map((id) => obtenerClientePorId(id)?.nombre_cliente || 'Desconocido')
-                .join(', ')
-                }
+                  multiple
+                  value={clientesSeleccionados}
+                  onChange={handleClienteChange}
+                  renderValue={(selected) =>
+                    selected.map((id) => obtenerClientePorId(id)?.nombre).join(', ')
+                  }
                   sx={{ color: 'black' }}
-  >
-                {clientes.map((cliente) => (
-                  <MenuItem key={cliente.id_cliente} value={cliente.id_cliente}>
-                    {cliente.nombre_cliente}
-                  </MenuItem>
-                 ))}
-               </Select>
+                >
+                  {clientes.map((cliente) => (
+                    <MenuItem key={cliente.id_cliente} value={cliente.id_cliente}>
+                      {cliente.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
               </FormControl>
 
 

@@ -9,22 +9,18 @@ import ProductoLista from "./productos/lista/listaProductos";
 import styled from "../page.module.css";
 
 
-export default function HomePage()  {
+export default function HomePage() {
     return (
         <div className={styled.page}>
 
             <main className={styled.main}>
-                <h1>bienvenido a mi pagina de iniHcio</h1>
-                {}
+                <h1>bienvenido a mi pagina de inicio</h1>
+                { }
             </main>
 
             <footer className={styled.footer}>
                 <p>2024 &copy; Todos los derechos reservados</p>
             </footer>
-
-            <ProveedorLista />
-            <ClienteLista />
-            <ProductoLista />
         </div>
     );
 }
