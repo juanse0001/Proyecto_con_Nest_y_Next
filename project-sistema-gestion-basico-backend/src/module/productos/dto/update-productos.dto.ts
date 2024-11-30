@@ -1,5 +1,4 @@
 import { IsOptional, IsString, IsBoolean, IsNumber, IsArray } from 'class-validator';
-import { Cliente } from 'src/module/clientes/schema/clientes.schema';
 import { Types } from 'mongoose';
 
 export class UpdateProductosDto {
@@ -21,7 +20,7 @@ export class UpdateProductosDto {
 
   @IsOptional()
   @IsArray()
-  cliente?: Cliente[];
+  cliente?: string[];
 
   @IsOptional()
   @IsBoolean()

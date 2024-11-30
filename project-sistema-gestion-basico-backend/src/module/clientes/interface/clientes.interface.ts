@@ -1,4 +1,4 @@
-export interface ICliente {
+export interface IClientes {
   id?: string;
   nombre: string;            // Nombre completo del cliente
   correoElectronico: string; // Dirección de correo electrónico

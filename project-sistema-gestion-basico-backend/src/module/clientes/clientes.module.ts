@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ClientesService } from './service/clientes.service';
 import { ClientesController } from './controller/clientes.controller';
-import { Cliente, ClienteSchema } from './schema/clientes.schema';
+import { Clientes, ClientesSchema } from './schema/clientes.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Cliente.name, schema: ClienteSchema }]),
+    MongooseModule.forFeature([{ name: Clientes.name, schema: ClientesSchema }]),
   ],
   controllers: [ClientesController],
   providers: [ClientesService],
-  exports: [ClientesService], // Exporta el servicio para otros módulos
+  exports: [ClientesService, MongooseModule], // Exporta el servicio para otros módulos
 })
 export class ClientesModule {}

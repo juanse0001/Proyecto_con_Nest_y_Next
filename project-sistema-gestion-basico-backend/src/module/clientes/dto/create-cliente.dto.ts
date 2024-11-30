@@ -1,12 +1,15 @@
-import { IsString, IsEmail, IsPhoneNumber, IsIn, IsOptional } from 'class-validator';
+import { IsString, IsEmail, IsPhoneNumber, IsIn, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class CreateClienteDto {
+  @IsNotEmpty()
   @IsString()
   readonly nombre: string;
 
+  @IsNotEmpty()
   @IsEmail()
   readonly correoElectronico: string;
 
+  @IsNotEmpty()
   @IsPhoneNumber() // Validación global para cualquier número de teléfono internacional
   readonly telefono: string;
 

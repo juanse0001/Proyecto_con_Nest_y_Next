@@ -1,4 +1,4 @@
-import { Cliente } from "src/module/clientes/schema/clientes.schema";
+import { Clientes } from "src/module/clientes/schema/clientes.schema";
 
 export interface IProductos {
     id?: string;

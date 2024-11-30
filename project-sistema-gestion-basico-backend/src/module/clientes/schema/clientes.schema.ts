@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ICliente } from '../interface/clientes.interface';
+import { IClientes } from '../interface/clientes.interface';
 import { Document } from 'mongoose';
 
 @Schema()
-export class Cliente extends Document implements ICliente {
+export class Clientes extends Document implements IClientes {
   @Prop({ required: true })
   nombre: string; // Nombre completo del cliente
 
@@ -17,4 +17,4 @@ export class Cliente extends Document implements ICliente {
   estado: 'activo' | 'inactivo'; // Estado del cliente
 }
 
-export const ClienteSchema = SchemaFactory.createForClass(Cliente);
+export const ClientesSchema = SchemaFactory.createForClass(Clientes);

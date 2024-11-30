@@ -15,6 +15,6 @@ import { Proveedores, ProveedoresSchema } from './schema/proveedores.schema';
   ],
   controllers: [ProveedoresController],
   providers: [ProveedoresServices],
-  exports: [ProveedoresServices], // Exporta el servicio
+  exports: [ProveedoresServices, MongooseModule], // Exporta el servicio
 })
 export class ProveedoresModule {}

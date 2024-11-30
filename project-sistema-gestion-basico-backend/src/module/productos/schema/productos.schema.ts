@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { IProductos } from '../interface/productos.interface';
-import { Cliente } from 'src/module/clientes/schema/clientes.schema';
+import { Clientes } from 'src/module/clientes/schema/clientes.schema';
 
 @Schema()
 export class Productos extends Document implements IProductos {
@@ -25,4 +25,4 @@ export class Productos extends Document implements IProductos {
   activo?: boolean;
 }
 
-export const ProductoSchema = SchemaFactory.createForClass(Productos);
+export const ProductosSchema = SchemaFactory.createForClass(Productos);

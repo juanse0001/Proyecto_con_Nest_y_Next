@@ -1,29 +1,30 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Cliente } from '../schema/clientes.schema';
+import { Clientes } from '../schema/clientes.schema';
 import { CreateClienteDto } from '../dto/create-cliente.dto';
 import { UpdateClienteDto } from '../dto/update-cliente.dto';
 
 @Injectable()
 export class ClientesService {
   constructor(
-    @InjectModel(Cliente.name) private readonly clienteModel: Model<Cliente>,
+    @InjectModel(Clientes.name) private readonly clienteModel: Model<Clientes>,
   ) {}
 
   // Crear un cliente
-  async create(createClienteDto: CreateClienteDto): Promise<Cliente> {
+  async create(createClienteDto: CreateClienteDto): Promise<Clientes> {
     const nuevoCliente = new this.clienteModel(createClienteDto);
     return await nuevoCliente.save();
   }
 
   // Obtener todos los clientes
-  async findAll(): Promise<Cliente[]> {
-    return await this.clienteModel.find().exec();
+  async findAll(): Promise<Clientes[]> {
+    const findAllClientes = await this.clienteModel.find().exec();
+    return findAllClientes
   }
 
   // Obtener un cliente por ID
-  async findOne(id: string): Promise<Cliente> {
+  async findOne(id: string): Promise<Clientes> {
     const cliente = await this.clienteModel.findById(id).exec();
     if (!cliente) {
       throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
@@ -32,7 +33,7 @@ export class ClientesService {
   }
 
   // Actualizar un cliente
-  async update(id: string, updateClienteDto: UpdateClienteDto): Promise<Cliente> {
+  async update(id: string, updateClienteDto: UpdateClienteDto): Promise<Clientes> {
     const clienteActualizado = await this.clienteModel
       .findByIdAndUpdate(id, updateClienteDto, { new: true })
       .exec();
@@ -52,7 +53,7 @@ export class ClientesService {
   }
 
     // Activar un cliente
-    async activate(id: string): Promise<Cliente> {
+    async activate(id: string): Promise<Clientes> {
       const clienteActivado = await this.clienteModel
         .findByIdAndUpdate(id, { estado: 'activo' }, { new: true })
         .exec();
@@ -63,7 +64,7 @@ export class ClientesService {
     }
   
     // Desactivar un cliente
-    async deactivate(id: string): Promise<Cliente> {
+    async deactivate(id: string): Promise<Clientes> {
       const clienteDesactivado = await this.clienteModel
         .findByIdAndUpdate(id, { estado: 'inactivo' }, { new: true })
         .exec();

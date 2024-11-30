@@ -27,8 +27,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 import { Productos } from '@/app/types/Producto.type';
-import { Proveedores } from '@/app/types/proveedor.type';
-import { Clientes } from '@/app/types/clientes.type';
+import { Proveedores } from '@/app/types/Proveedor.type';
+import { Clientes } from '@/app/types/Clientes.type';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -310,7 +310,7 @@ const ProductoLista: React.FC = () => {
     const productoData = {
       ...nuevoProducto,
       cliente: clientesSeleccionadosDetalles,
-      proveedor: proveedoresSeleccionadosDetalles,
+      proveedor: proveedoresSeleccionadosDetalles
     };
 
     crearProducto(productoData);

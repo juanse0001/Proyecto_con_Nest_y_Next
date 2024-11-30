@@ -11,7 +11,7 @@ import {
 import { ClientesService } from '../service/clientes.service';
 import { CreateClienteDto } from '../dto/create-cliente.dto';
 import { UpdateClienteDto } from '../dto/update-cliente.dto';
-import { Cliente } from '../schema/clientes.schema';
+import { Clientes } from '../schema/clientes.schema';
 
 import {
   ApiTags,
@@ -30,14 +30,14 @@ export class ClientesController {
   @ApiOperation({ summary: 'Crear un nuevo cliente' })
   @ApiResponse({ status: 201, description: 'Cliente creado exitosamente' })
   @ApiResponse({ status: 400, description: 'Solicitud inválida' })
-  async create(@Body() createClienteDto: CreateClienteDto): Promise<Cliente> {
+  async create(@Body() createClienteDto: CreateClienteDto): Promise<Clientes> {
     return await this.clientesService.create(createClienteDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los clientes' })
   @ApiResponse({ status: 200, description: 'Lista de clientes obtenida exitosamente' })
-  async findAll(): Promise<Cliente[]> {
+  async findAll(): Promise<Clientes[]> {
     return await this.clientesService.findAll();
   }
 
@@ -45,7 +45,7 @@ export class ClientesController {
   @ApiOperation({ summary: 'Obtener un cliente por su ID' })
   @ApiResponse({ status: 200, description: 'Cliente encontrado' })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
-  async findOne(@Param('id') id: string): Promise<Cliente> {
+  async findOne(@Param('id') id: string): Promise<Clientes> {
     return await this.clientesService.findOne(id);
   }
 
@@ -56,7 +56,7 @@ export class ClientesController {
   async update(
     @Param('id') id: string,
     @Body() updateClienteDto: UpdateClienteDto,
-  ): Promise<Cliente> {
+  ): Promise<Clientes> {
     const cliente = await this.clientesService.update(id, updateClienteDto);
     if (!cliente) {
       throw new NotFoundException(`Cliente con ID ${id} no encontrado`);
@@ -82,7 +82,7 @@ export class ClientesController {
     description: 'ID del cliente que se desea activar',
     type: String,
   })
-  async activate(@Param('id') id: string): Promise<Cliente> {
+  async activate(@Param('id') id: string): Promise<Clientes> {
     return await this.clientesService.activate(id);
   }
 
@@ -96,7 +96,7 @@ export class ClientesController {
     description: 'ID del cliente que se desea desactivar',
     type: String,
   })
-  async deactivate(@Param('id') id: string): Promise<Cliente> {
+  async deactivate(@Param('id') id: string): Promise<Clientes> {
     return await this.clientesService.deactivate(id);
   }
 }
